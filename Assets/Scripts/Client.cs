@@ -25,12 +25,13 @@ public class Client : MonoBehaviour
     private const float SERVER_TICK_RATE = 30f;
     private const int BUFFER_SIZE = 1024;
 
+    // Client specific
     private StatePayload[] stateBuffer;
     private InputPayload[] inputBuffer;
     private StatePayload latestServerState;
     private StatePayload lastProcessedState;
-    private float horizontal;
-    private float vertical;
+    private float horizontalInput;
+    private float verticalInput;
 
     void Awake()
     {
@@ -47,13 +48,8 @@ public class Client : MonoBehaviour
 
     void Update()
     {
-        horizontal = Input.GetAxis("Horizontal");
-        vertical = Input.GetAxis("Vertical");
-
-        if (horizontal == 0 && vertical == 0)
-        {
-            return;
-        }
+        horizontalInput = Input.GetAxis("Horizontal");
+        verticalInput = Input.GetAxis("Vertical");
 
         timer += Time.deltaTime;
 
@@ -79,23 +75,19 @@ public class Client : MonoBehaviour
 
     void HandleTick()
     {
-        // Do things in Tick
-        if (!latestServerState.Equals(default(StatePayload)) && (lastProcessedState.Equals(default(StatePayload)) || !latestServerState.Equals(lastProcessedState)))
+        if (!latestServerState.Equals(default(StatePayload)) &&
+            (lastProcessedState.Equals(default(StatePayload)) ||
+            !latestServerState.Equals(lastProcessedState)))
         {
             HandleServerReconciliation();
         }
 
-        HandleInput();
-    }
-
-    void HandleInput()
-    {
         int bufferIndex = currentTick % BUFFER_SIZE;
 
         // Add payload to inputBuffer
         InputPayload inputPayload = new InputPayload();
         inputPayload.tick = currentTick;
-        inputPayload.inputVector = new Vector3(horizontal, 0, vertical);
+        inputPayload.inputVector = new Vector3(horizontalInput, 0, verticalInput);
         inputBuffer[bufferIndex] = inputPayload;
 
         // Add payload to stateBuffer
@@ -131,7 +123,7 @@ public class Client : MonoBehaviour
             transform.position = latestServerState.position;
 
             // Update buffer at index of latest server state
-            stateBuffer[serverStateBufferIndex].position = transform.position;
+            stateBuffer[serverStateBufferIndex] = latestServerState;
 
             // Now re-simulate the rest of the ticks up to the current tick on the client
             int tickToProcess = latestServerState.tick + 1;

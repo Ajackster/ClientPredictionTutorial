@@ -12,8 +12,8 @@ public class Server : MonoBehaviour
     private const float SERVER_TICK_RATE = 30f;
     private const int BUFFER_SIZE = 1024;
 
-    private Queue<InputPayload> inputQueue;
     private StatePayload[] stateBuffer;
+    private Queue<InputPayload> inputQueue;
 
     void Awake()
     {
@@ -30,11 +30,6 @@ public class Server : MonoBehaviour
 
     void Update()
     {
-        if (inputQueue.Count == 0)
-        {
-            return;
-        }
-
         timer += Time.deltaTime;
 
         while (timer >= minTimeBetweenTicks)
