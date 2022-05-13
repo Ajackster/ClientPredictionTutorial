@@ -130,11 +130,12 @@ public class Client : MonoBehaviour
 
             while (tickToProcess < currentTick)
             {
+                int bufferIndex = tickToProcess % BUFFER_SIZE;
+
                 // Process new movement with reconciled state
-                StatePayload statePayload = ProcessMovement(inputBuffer[tickToProcess]);
+                StatePayload statePayload = ProcessMovement(inputBuffer[bufferIndex]);
 
                 // Update buffer with recalculated state
-                int bufferIndex = tickToProcess % BUFFER_SIZE;
                 stateBuffer[bufferIndex] = statePayload;
 
                 tickToProcess++;
